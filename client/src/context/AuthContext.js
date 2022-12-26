@@ -40,9 +40,50 @@ export const AuthProvider = ({children}) => {
         }
     }
 
+    const registerUser = async(username, password, password2)=>{
+        const url = "http://127.0.0.1:8000/api/register/";
+        const res = await fetch(url, {
+            method:'POST',
+            headers:{
+                "Content-Type": "application/json",
+            },
+            body:JSON.stringify({
+                username,
+                password,
+                password2
+            })
+        });
+
+        if (res.status===201){
+            history.push('/login');
+        }
+        else{
+            alert("Something went wrong!!");
+        }        
+    };
+    const logoutUser = ()=>{
+        setAuthtokens(null);
+        setUser(null);
+        localStorage.removeItem("authTokens");
+        history.push("/");
+    };
+
+    const contextData = {
+        user,
+        setUser,
+        authTokens,
+        setAuthtokens,
+        registerUser,
+        loginUser,
+        logoutUser
+    };
     
-
-
+    useEffect(()=>{
+        if(authTokens){
+            setUser(jwt_decode(authTokens.access));
+        }
+        setLoading(false);
+    }, [authTokens, loading])
 
     return (
         <AuthContext.Provider value={contextData}>
